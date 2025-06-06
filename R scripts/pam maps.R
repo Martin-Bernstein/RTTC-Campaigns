@@ -5,8 +5,10 @@ library(plotly)
 library(data.table)
 library(htmltools)
 library(dplyr)
+library(usmap)
 
 ####State-level####
+
 d <- fread(file.path('data','state-level campaign.csv'))
 
 highlight_states <- tolower(unique(d$`State(s)`))
@@ -17,11 +19,11 @@ camp[,region := tolower(`State(s)`)]
 
 # Load US state map data
 us_states <- map_data("state")
-
 # Add a column to flag highlighted states
 setDT(us_states)
 us_states[,highlight := region %in% highlight_states]
 us_states[,campaigns := camp[.SD,on=.(region),x.campaign]]
+
 
 # Plot the map
 p <- ggplot(us_states, aes(long, lat, group = group,text=campaigns)) +
@@ -31,6 +33,7 @@ p <- ggplot(us_states, aes(long, lat, group = group,text=campaigns)) +
   theme_void() +
   theme(legend.position = "none")+
   labs(title='States with state-level power-building by a hub or member organization')
+p
 # g <- ggplotly(p, tooltip = "text")
 g <- ggplotly(p, tooltip = "text") %>% layout(width = 800, height = 500)
 # Remove polygon hover

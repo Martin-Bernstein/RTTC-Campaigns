@@ -87,7 +87,7 @@ g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
 
 g
-htmlwidgets::saveWidget(g, "state_campaigns.html")
+htmlwidgets::saveWidget(g, file.path('map htmls',"state_campaigns.html"))
 state_plot <- g
 
 ####Hubs####
@@ -163,7 +163,7 @@ g <- ggplotly(p_hubs, tooltip = "text") %>%
 g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
 
-htmlwidgets::saveWidget(g, "hubs.html")
+htmlwidgets::saveWidget(g, file.path('map htmls',"hubs.html"))
 hub_plot <- g
 
 ####City-level####
@@ -250,7 +250,7 @@ g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
 
 # Save or display
-htmlwidgets::saveWidget(g, "city_campaigns.html")
+htmlwidgets::saveWidget(g, file.path('map htmls',"city_campaigns.html"))
 #g
 city_plot <- g
 
@@ -327,7 +327,7 @@ g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
 
 # Save or display
-htmlwidgets::saveWidget(g, "c4s.html")
+htmlwidgets::saveWidget(g, file.path('map htmls',"c4s.html"))
 #g
 c4_plot <- g
 
@@ -371,4 +371,4 @@ dashboard <- tagList(
 )
 
 # Save the dashboard as HTML
-htmltools::save_html(dashboard, file.path("dashboard","campaign_dashboard.html"))
+htmltools::save_html(dashboard, file.path("campaign_dashboard.html"))

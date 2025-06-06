@@ -45,7 +45,7 @@ jobs:
       # 5) Run your R script to regenerate the HTMLs
       - name: Run maps_all50.R
         run: |
-          Rscript maps_all50.R
+          Rscript "R scripts/maps_all50.R"
 
       # 6) Commit and push any changes to the generated HTMLs
       - name: Commit and push updated HTML

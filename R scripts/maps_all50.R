@@ -5,7 +5,7 @@ library(data.table)
 library(htmltools)
 library(dplyr)
 library(usmap)
-
+library(sf)
 ####State-level####
 # ——————————————————————————————————————————————
 # (A) Read in your CSV / build ‘highlight’ + ‘campaigns’ exactly as before
@@ -19,7 +19,15 @@ setwd(
   )
 )
 
-d <- fread(file.path('data','state-level campaign.csv'))
+#Hepler airtable functions
+source(file.path('R scripts','get airtable data.R'))
+
+# d <- fread(file.path('data','state-level campaign.csv'))
+#Read data directly from airtable
+campdata <- read_airtable(campt)%>%
+  setDT()
+d <- campdata[`Campaign Scale` == 'State level']
+d[,`State(s)` := vapply(`State(s)`, resolve_linked, character(1),lookup_dt = states)]
 
 # Which states to highlight?  (make lowercase)
 highlight_states <- tolower(unique(d$`State(s)`))
@@ -95,7 +103,14 @@ state_plot <- g
 # 1. Read hubs.csv and split “States” into one‐row‐per‐State
 # ——————————————————————————————————————————————
 
-h <- fread(file.path('data','hubs.csv'))
+# h <- fread(file.path('data','hubs.csv'))
+#Read from airtable
+h <- read_airtable(hubt)
+setDT(h)
+# Convert states from linked record ids to names (rowwise).
+h[, States := vapply(States, resolve_linked, character(1), lookup_dt = states)]
+#resolve_linked is in "get airtable data.R"
+
 h <- h[, .(Hub, States)]
 # Keep only non‐empty “States” rows
 h_clean <- h[nzchar(States)]
@@ -150,8 +165,8 @@ p_hubs <- ggplot() +
     color = "black"
   ) +
   theme_void() +
-  theme(legend.position = "none") +
-  labs(title = "Hubs")
+  theme(legend.position = "bottom") +
+  labs(title = "Hubs",fill=NULL)
 
 #p_hubs
 
@@ -171,11 +186,18 @@ hub_plot <- g
 # 1. Read city‐level CSV and build 'tooltip'; make a 'lon' column
 # ——————————————————————————————————————————————
 
-dt <- fread(file.path("data","city-level powerbuilding.csv"))
+# dt <- fread(file.path("data","city-level powerbuilding.csv"))
+dt <- campdata[`Campaign Scale` == 'Municipal']
+dt[,`State(s)` := vapply(`State(s)`, resolve_linked, character(1),lookup_dt = states)]
+
+dt <- dt[,c('Campaign','Organization(s)','Campaign Scale','Organization latitudes','Organization longitudes')]
 setnames(dt, c("campaign","org","scale","lat","long"))
 
-# Fix the one row with missing coords (row 32 → New York City)
-dt[32, c("lat","long") := .(40.7127753, -74.0059728)]
+dt[,org := vapply(org,resolve_linked,character(1),lookup_dt=orgs)]
+
+#Fix the one with multiple coords
+dt[lengths(lat) > 1 , c("lat","long") := .(40.7127753, -74.0059728)]
+#dt[32, c("lat","long") := .(40.7127753, -74.0059728)]
 
 # Ensure lat/long are numeric
 dt[, c("lat","long") := .(as.numeric(lat), as.numeric(long))]
@@ -259,9 +281,14 @@ city_plot <- g
 # 1. Read c4.csv and rename columns
 # ——————————————————————————————————————————————
 
-c4 <- fread(file.path("data","c4s.csv"))
-setnames(c4, c("c4","c3","att","lat","long"))
+# c4 <- fread(file.path("data","c4s.csv"))
+c4 <- read_airtable(c4t)
+setDT(c4)
+c4[,'Attendances':=NULL]
 
+setnames(c4, c("airtable_record_id","c4","c3","lat","long"))
+c4[,c3 := vapply(c3,resolve_linked,character(1),lookup_dt=orgs)]
+c4[,c('lat','long'):=.(as.numeric(lat),as.numeric(long))]
 # Copy long → lon so that usmap_transform() can find it
 c4[, lon := long]
 

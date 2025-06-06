@@ -1,6 +1,5 @@
 library(rairtable)
 library(data.table)
-library(dplyr)
 
 # Define a helper function: take a vector of record IDs and return a comma-separated string
 #Lookup dt must have columns "airtable_record_id", "name"

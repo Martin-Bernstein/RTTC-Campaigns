@@ -1,11 +1,10 @@
 library(ggplot2)
-library(maps)
 library(plotly)
 library(data.table)
 library(htmltools)
-library(dplyr)
 library(usmap)
 library(sf)
+library(rairtable)
 ####State-level####
 # ——————————————————————————————————————————————
 # (A) Read in your CSV / build ‘highlight’ + ‘campaigns’ exactly as before
@@ -24,8 +23,8 @@ source(file.path('R scripts','get airtable data.R'))
 
 # d <- fread(file.path('data','state-level campaign.csv'))
 #Read data directly from airtable
-campdata <- read_airtable(campt)%>%
-  setDT()
+campdata <- read_airtable(campt)
+setDT(campdata)
 d <- campdata[`Campaign Scale` == 'State level']
 d[,`State(s)` := vapply(`State(s)`, resolve_linked, character(1),lookup_dt = states)]
 
@@ -89,7 +88,8 @@ p <- ggplot(state_map_for_campaigns) +
     title = "States with state‐level powerbuilding by a hub or member organization"
   )
 
-g <- ggplotly(p, tooltip = "text") %>% layout(width = 800, height = 500)
+g <- ggplotly(p, tooltip = "text") # %>% layout(width = 800, height = 500)
+g <- layout(g, width=800,height=500)
 # Remove polygon hover
 g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
@@ -171,8 +171,8 @@ p_hubs <- ggplot() +
 #p_hubs
 
 # Make interactive
-g <- ggplotly(p_hubs, tooltip = "text") %>%
-  layout(width = 800, height = 500)
+g <- ggplotly(p_hubs, tooltip = "text")
+g <- layout(g, width = 800, height = 500)
 
 # Remove any remaining default tooltip on the map background
 g$x$data[[1]]$text <- NULL
@@ -265,8 +265,8 @@ p_city <- ggplot() +
 
 # Convert to interactive plot
 # g <- ggplotly(p, tooltip = "text")
-g <- ggplotly(p_city, tooltip = "text") %>% layout(width = 800, height = 500)
-
+g <- ggplotly(p_city, tooltip = "text") #%>% layout(width = 800, height = 500)
+g <- layout(g,width=800,height=500)
 # Remove polygon hover
 g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
@@ -347,8 +347,8 @@ p_c4 <- ggplot() +
 #p_c4
 # Convert to interactive plot
 # g <- ggplotly(p, tooltip = "text")
-g <- ggplotly(p_c4, tooltip = "text") %>% layout(width = 800, height = 500)
-
+g <- ggplotly(p_c4, tooltip = "text") #%>% layout(width = 800, height = 500)
+g <- layout(g,width=800,height=500)
 # Remove polygon hover
 g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"

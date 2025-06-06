@@ -38,7 +38,7 @@ jobs:
       - name: Install R package dependencies
         run: |
           R -e 'install.packages(
-                  c("data.table","usmap","ggplot2","plotly","htmltools","dplyr","sf"), 
+                  c("data.table","usmap","ggplot2","plotly","htmltools","rairtable","sf"), 
                   repos="https://cloud.r-project.org"
                 )'
 

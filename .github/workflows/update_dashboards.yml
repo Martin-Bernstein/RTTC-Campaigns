@@ -8,8 +8,8 @@ on:
   workflow_dispatch: {}
 
 jobs:
-  update‐dashboard:
-    runs‐on: ubuntu‐latest
+  update_dashboard:
+    runs-on: ubuntu-latest
 
     steps:
       # 1) Check out the current code

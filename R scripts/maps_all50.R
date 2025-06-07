@@ -10,13 +10,14 @@ library(rairtable)
 # (A) Read in your CSV / build ‘highlight’ + ‘campaigns’ exactly as before
 # ——————————————————————————————————————————————
 
-setwd(
-  file.path(
-    '~','Library','CloudStorage',
-    'GoogleDrive-mbernstein@g.harvard.edu/My Drive/Summer 2025',
-    'rttc','Pam Maps'
-  )
-)
+#Need this when running locally; when running automatically in github actions, don't need.
+# setwd(
+#   file.path(
+#     '~','Library','CloudStorage',
+#     'GoogleDrive-mbernstein@g.harvard.edu/My Drive/Summer 2025',
+#     'rttc','Pam Maps'
+#   )
+# )
 
 #Hepler airtable functions
 source(file.path('R scripts','get airtable data.R'))

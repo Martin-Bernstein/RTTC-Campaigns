@@ -2,6 +2,10 @@
 
 name: Rebuild Dashboard
 
+# Grant this workflow write access to repo contents
+permissions:
+  contents: write
+
 on:
   schedule:
     - cron: '*/30 * * * *'   # every 30 minutes UTC

@@ -3,10 +3,8 @@
 name: Rebuild Dashboard
 
 on:
-  # Every 30 minutes (UTC); adjust to */10 if you prefer 10-minute intervals
   schedule:
-    - cron: '*/30 * * * *'
-  # Allow manual trigger from the Actions UI
+    - cron: '*/30 * * * *'   # every 30 minutes UTC
   workflow_dispatch: {}
 
 jobs:
@@ -20,24 +18,23 @@ jobs:
         with:
           persist-credentials: true
 
-      # 2) Install R, configured to use RStudio Public Package Manager
+      # 2) Set up R (via RSPM binaries)
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
           use-public-rspm: true
 
-      # 3) Install Pandoc for self-contained HTML widgets
-      - name: Install Pandoc
-        uses: r-lib/actions/setup-pandoc@v2
+      # 3) Install system libs needed by sf & units
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y \
+            libudunits2-dev \
+            libproj-dev \
+            libgeos-dev \
+            libgdal-dev
 
-      # 4) (Optional) Install any geospatial system libs—RSPM binaries often skip this,
-      #    but if you still hit sf complains, uncomment:
-      #- name: Install system dependencies
-      #  run: |
-      #    sudo apt-get update -qq
-      #    sudo apt-get install -y libudunits2-dev libproj-dev libgeos-dev libgdal-dev
-
-      # 5) Install your R package dependencies via RSPM
+      # 4) Install R packages (binaries from RSPM where available)
       - name: Install R package dependencies
         run: |
           Rscript -e 'install.packages(c(
@@ -50,12 +47,12 @@ jobs:
             "sf"
           ))'
 
-      # 6) Run your map‐building script
+      # 5) Run your dashboard‐building script
       - name: Run maps_all50.R
         run: |
           Rscript "R scripts/maps_all50.R"
 
-      # 7) Commit & push any updated HTMLs back to GitHub
+      # 6) Commit & push updated HTML files
       - name: Commit and push updated HTML
         run: |
           git config user.name  "github-actions[bot]"

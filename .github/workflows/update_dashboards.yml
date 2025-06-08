@@ -1,72 +1,69 @@
-name: “Rebuild Dashboard”
+# File: .github/workflows/update_dashboards.yml
 
-# Run this workflow on a schedule (every 10 minutes):
+name: Rebuild Dashboard
+
 on:
+  # Every 30 minutes (UTC); adjust to */10 if you prefer 10-minute intervals
   schedule:
-    - cron:  '*/30 * * * *'    # runs at minute 0,10,20,30,40,50 of every hour (UTC)
-  # You can also allow manual “Run workflow” via the GitHub Actions UI:
+    - cron: '*/30 * * * *'
+  # Allow manual trigger from the Actions UI
   workflow_dispatch: {}
 
 jobs:
-  update_dashboard:
+  update-dashboard:
     runs-on: ubuntu-latest
 
     steps:
-      # 1) Check out the current code
+      # 1) Check out the repo
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          # needed so that we can push back changes
-          persist-credentials: true  
-          # By default, GITHUB_TOKEN is used so that we can push changes
-      
-      # 2) Set up R environment
-      #- name: Set up R
-      #  uses: r-lib/actions/setup-r@v2
-      #  with:
-      #    #Supposedly, uses RStudio's public package manager.
-      #    use-public-rspm: true
+          persist-credentials: true
+
+      # 2) Install R, configured to use RStudio Public Package Manager
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
 
-      # 3) Install any system libraries if needed
-      #    (for most pure‐R packages, you may not need any apt‐get)
-      #    But if usmap needs 'libudunits2-dev' or 'libgeos', you can add here.
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y \
-            libudunits2-dev \
-            libproj-dev \
-            libgeos-dev \
-            libgdal-dev
+      # 3) Install Pandoc for self-contained HTML widgets
+      - name: Install Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
 
-      # 4) Install the R packages that your script relies on.
-      #    Adjust the version numbers as desired. This block uses install.R to be reproducible.
-      #    Alternatively you can call `install.packages(...)` directly.
+      # 4) (Optional) Install any geospatial system libs—RSPM binaries often skip this,
+      #    but if you still hit sf complains, uncomment:
+      #- name: Install system dependencies
+      #  run: |
+      #    sudo apt-get update -qq
+      #    sudo apt-get install -y libudunits2-dev libproj-dev libgeos-dev libgdal-dev
+
+      # 5) Install your R package dependencies via RSPM
       - name: Install R package dependencies
         run: |
-          R -e 'install.packages(
-                  c("data.table","usmap","ggplot2","plotly","htmltools","rairtable","sf"), 
-                  repos="https://cloud.r-project.org"
-                )'
+          Rscript -e 'install.packages(c(
+            "data.table",
+            "usmap",
+            "ggplot2",
+            "plotly",
+            "htmltools",
+            "rairtable",
+            "sf"
+          ))'
 
-      # 5) Run your R script to regenerate the HTMLs
+      # 6) Run your map‐building script
       - name: Run maps_all50.R
         run: |
           Rscript "R scripts/maps_all50.R"
 
-      # 6) Commit and push any changes to the generated HTMLs
+      # 7) Commit & push any updated HTMLs back to GitHub
       - name: Commit and push updated HTML
         run: |
-          git config user.name "github-actions[bot]"
+          git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Stage only the changes in the 'map htmls/' directory
           git add "map htmls/"
-          # Check if there’s anything new to commit
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "Auto‐update dashboard HTMLs via GitHub Actions"
+            git commit -m "Auto-update dashboard HTMLs via GitHub Actions"
             git push
           fi

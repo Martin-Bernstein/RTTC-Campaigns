@@ -96,7 +96,7 @@ g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
 
 g
-htmlwidgets::saveWidget(g, file.path('map htmls',"state_campaigns.html"))
+htmlwidgets::saveWidget(g, file.path("state_campaigns.html"))
 state_plot <- g
 
 ####Hubs####
@@ -179,7 +179,7 @@ g <- layout(g, width = 800, height = 500)
 g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
 
-htmlwidgets::saveWidget(g, file.path('map htmls',"hubs.html"))
+htmlwidgets::saveWidget(g, file.path("hubs.html"))
 hub_plot <- g
 
 ####City-level####
@@ -273,7 +273,7 @@ g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
 
 # Save or display
-htmlwidgets::saveWidget(g, file.path('map htmls',"city_campaigns.html"))
+htmlwidgets::saveWidget(g, file.path("city_campaigns.html"))
 #g
 city_plot <- g
 
@@ -355,7 +355,7 @@ g$x$data[[1]]$text <- NULL
 g$x$data[[1]]$hoverinfo <- "none"
 
 # Save or display
-htmlwidgets::saveWidget(g, file.path('map htmls',"c4s.html"))
+htmlwidgets::saveWidget(g, file.path("c4s.html"))
 #g
 c4_plot <- g
 
@@ -400,3 +400,4 @@ dashboard <- tagList(
 
 # Save the dashboard as HTML
 htmltools::save_html(dashboard, file.path("campaign_dashboard.html"))
+# htmlwidgets::saveWidget(dashboard, file.path("campaign_dashboard.html"))
